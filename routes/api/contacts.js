@@ -1,5 +1,5 @@
 import express from 'express'
-import { postValidation, patchValidation } from '../../validations/contacts.js'
+import { postValidation, patchValidation, intId } from '../../middlware/contacts.js'
 import {
   listContacts,
   getContactById,
@@ -21,13 +21,9 @@ router.get('/', async (_req, res) => {
 /**
  * Response one contact
  */
-router.get('/:contactId', async (req, res) => {
+router.get('/:contactId', intId, async (req, res) => {
   const { contactId } = req.params
-  const idInt = parseInt(contactId)
-  if (isNaN(idInt)) {
-    return res.status(404).json({ message: 'Not found' })
-  }
-  const result = await getContactById(idInt)
+  const result = await getContactById(contactId)
   if (result) {
     res.json(result)
   } else {
@@ -38,12 +34,7 @@ router.get('/:contactId', async (req, res) => {
 /**
  * Add contact
 */
-router.post('/', async (req, res) => {
-  const { error } = postValidation(req.body)
-  if (error) {
-    console.log(error.details[0].message)
-    return res.status(400).json({ message: error.details[0].message })
-  }
+router.post('/', postValidation, async (req, res) => {
   const contact = { id: Date.now(), ...req.body }
   const result = await addContact(contact)
   res.status(201).json(result)
@@ -52,13 +43,9 @@ router.post('/', async (req, res) => {
 /**
  * Delete contact
  */
-router.delete('/:contactId', async (req, res) => {
+router.delete('/:contactId', intId, async (req, res) => {
   const { contactId } = req.params
-  const idInt = parseInt(contactId)
-  if (isNaN(idInt)) {
-    return res.status(404).json({ message: 'Not found' })
-  }
-  const result = await removeContact(idInt)
+  const result = await removeContact(contactId)
   if (result) {
     res.status(200).json({ message: 'contact deleted' })
   } else {
@@ -66,22 +53,11 @@ router.delete('/:contactId', async (req, res) => {
   }
 })
 
-router.patch('/:contactId', async (req, res) => {
+router.patch('/:contactId', patchValidation, intId, async (req, res) => {
   const { contactId } = req.params
-  const idInt = parseInt(contactId)
-  if (isNaN(idInt)) {
-    return res.status(404).json({ message: 'Not found' })
-  }
-
-  const { error } = patchValidation(req.body)
-  if (error) {
-    console.log(error.details[0].message)
-    return res.status(400).json({ message: error.details[0].message })
-  }
-
   const { name, email, phone } = req.body
   if (name || email || phone) {
-    const result = await updateContact(idInt, req.body)
+    const result = await updateContact(contactId, req.body)
     if (result) {
       res.status(200).json(result)
     } else {
