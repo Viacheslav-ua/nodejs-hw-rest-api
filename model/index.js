@@ -1,35 +1,29 @@
-const fs = require('fs/promises')
-const path = require('path')
-const contactsPath = path.join(__dirname, './contacts.json')
+import fs from 'fs/promises'
+import path from 'path'
 
-const listContacts = async () => {
+const __dirname = path.resolve()
+const contactsPath = path.join(__dirname, 'model/contacts.json')
+
+export const listContacts = async () => {
   try {
     const content = await fs.readFile(contactsPath, 'utf8')
     return JSON.parse(content)
   } catch (error) {
     console.log(error)
-    process.exit(1)
   }
 }
 
-const getContactById = async (contactId) => {
+export const getContactById = async (contactId) => {
   const data = await listContacts()
   return data.find((item) => item.id === contactId)
 }
 
-const removeContact = async (contactId) => {
+export const removeContact = async (contactId) => {
   const data = await listContacts()
-  let isFound = false
-  const result = data.filter((item) => {
-    if (item.id === contactId) {
-      isFound = true
-      return false
-    }
-    return true
-  })
-  if (!isFound) {
+  if (!data.some((contact) => contact.id === contactId)) {
     return false
   }
+  const result = data.filter((item) => item.id !== contactId)
 
   try {
     await fs.writeFile(contactsPath, JSON.stringify(result, null, 2))
@@ -40,7 +34,7 @@ const removeContact = async (contactId) => {
   }
 }
 
-const addContact = async (contact) => {
+export const addContact = async (contact) => {
   const data = await listContacts()
   data.push(contact)
   try {
@@ -48,17 +42,17 @@ const addContact = async (contact) => {
     return contact
   } catch (error) {
     console.log(error)
-    process.exit(1)
   }
 }
 
-const updateContact = async (contactId, body) => {
+export const updateContact = async (contactId, body) => {
   const data = await listContacts()
+  if (!data.some((contact) => contact.id === contactId)) {
+    return false
+  }
   const { name, email, phone } = body
-  let isFound = false
   const result = data.map((item) => {
     if (item.id === contactId) {
-      isFound = true
       return {
         id: contactId,
         name: name || item.name,
@@ -69,22 +63,19 @@ const updateContact = async (contactId, body) => {
       return item
     }
   })
-  if (isFound) {
-    try {
-      await fs.writeFile(contactsPath, JSON.stringify(result, null, 2))
-      return result.find((item) => item.id === contactId)
-    } catch (error) {
-      console.log(error)
-      return false
-    }
+  try {
+    await fs.writeFile(contactsPath, JSON.stringify(result, null, 2))
+    return result.find((item) => item.id === contactId)
+  } catch (error) {
+    console.log(error)
+    return false
   }
-  return false
 }
 
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+// export default {
+//   listContacts,
+//   getContactById,
+//   removeContact,
+//   addContact,
+//   updateContact,
+// }

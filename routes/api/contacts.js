@@ -1,118 +1,95 @@
-const express = require('express')
-const Joi = require('joi')
-const {
+import express from 'express'
+import { postValidation, patchValidation } from '../../validations/contacts.js'
+import {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
-} = require('../../model/index')
+} from '../../model/index.js'
 
 const router = express.Router()
 
 /**
  * Response all contacts
  */
-router.get('/', async (req, res, next) => {
+router.get('/', async (_req, res) => {
   const data = await listContacts()
   res.json(data)
-  // next()
 })
 
 /**
  * Response one contact
  */
-router.get('/:contactId', async (req, res, next) => {
+router.get('/:contactId', async (req, res) => {
   const { contactId } = req.params
   const idInt = parseInt(contactId)
   if (isNaN(idInt)) {
-    res.status(404)
-    res.json({ message: 'Not found' })
-    return
+    return res.status(404).json({ message: 'Not found' })
   }
   const result = await getContactById(idInt)
   if (result) {
     res.json(result)
   } else {
-    res.status(404)
-    res.json({ message: 'Not found' })
+    res.status(404).json({ message: 'Not found' })
   }
 })
 
 /**
  * Add contact
- */
-router.post('/', async (req, res, next) => {
-  const resultValidate = Joi.object().keys({
-    name: Joi.string().trim().required(),
-    email: Joi.string().trim().email().required(),
-    phone: Joi.string().trim().required(),
-  }).validate(req.body)
-
-  if (resultValidate.error) {
-    console.log(resultValidate.error)
-    res.status(400)
-    return res.json({ message: 'missing required name field' })
+*/
+router.post('/', async (req, res) => {
+  const { error } = postValidation(req.body)
+  if (error) {
+    console.log(error.details[0].message)
+    return res.status(400).json({ message: error.details[0].message })
   }
-  const contact = { id: Date.now(), ...resultValidate.value }
+  const contact = { id: Date.now(), ...req.body }
   const result = await addContact(contact)
-  res.status(201)
-  res.json(result)
+  res.status(201).json(result)
 })
 
 /**
  * Delete contact
  */
-router.delete('/:contactId', async (req, res, next) => {
+router.delete('/:contactId', async (req, res) => {
   const { contactId } = req.params
   const idInt = parseInt(contactId)
   if (isNaN(idInt)) {
-    res.status(404)
-    res.json({ message: 'Not found' })
-    return
+    return res.status(404).json({ message: 'Not found' })
   }
   const result = await removeContact(idInt)
   if (result) {
-    res.status(200)
-    res.json({ message: 'contact deleted' })
+    res.status(200).json({ message: 'contact deleted' })
   } else {
-    res.status(404)
-    res.json({ message: 'Not found' })
+    res.status(404).json({ message: 'Not found' })
   }
 })
 
-router.patch('/:contactId', async (req, res, next) => {
+router.patch('/:contactId', async (req, res) => {
   const { contactId } = req.params
   const idInt = parseInt(contactId)
   if (isNaN(idInt)) {
-    res.status(404)
-    res.json({ message: 'Not found' })
-    return
+    return res.status(404).json({ message: 'Not found' })
   }
-  const resultValidate = Joi.object().keys({
-    name: Joi.string().trim(),
-    email: Joi.string().trim().email(),
-    phone: Joi.string().trim(),
-  }).validate(req.body)
-  if (resultValidate.error) {
-    console.log(resultValidate.error)
-    res.status(400)
-    return res.json({ message: 'missing required field' })
+
+  const { error } = patchValidation(req.body)
+  if (error) {
+    console.log(error.details[0].message)
+    return res.status(400).json({ message: error.details[0].message })
   }
+
   const { name, email, phone } = req.body
   if (name || email || phone) {
-    const result = await updateContact(idInt, resultValidate.value)
+    const result = await updateContact(idInt, req.body)
     if (result) {
-      res.status(200)
-      res.json(result)
+      res.status(200).json(result)
     } else {
-      res.status(404)
-      res.json({ message: 'Not found' })
+      res.status(404).json({ message: 'Not found' })
     }
   } else {
-    res.status(400)
-    res.json({ message: 'missing fields' })
+    res.status(400).json({ message: 'missing fields' })
   }
 })
 
-module.exports = router
+export default router
