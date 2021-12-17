@@ -1,8 +1,10 @@
 import fs from 'fs/promises'
-import path from 'path'
+import path, { dirname } from 'path'
+import { fileURLToPath } from 'url'
 
-const __dirname = path.resolve()
-const contactsPath = path.join(__dirname, 'model/contacts.json')
+// const __dirname = path.resolve()
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const contactsPath = path.join(__dirname, 'contacts.json')
 
 export const listContacts = async () => {
   try {
@@ -13,17 +15,17 @@ export const listContacts = async () => {
   }
 }
 
-export const getContactById = async (contactId) => {
+export const getContactById = async (id) => {
   const data = await listContacts()
-  return data.find((item) => item.id === contactId)
+  return data.find((item) => item.id === id)
 }
 
-export const removeContact = async (contactId) => {
+export const removeContact = async (id) => {
   const data = await listContacts()
-  if (!data.some((contact) => contact.id === contactId)) {
+  if (!data.some((contact) => contact.id === id)) {
     return false
   }
-  const result = data.filter((item) => item.id !== contactId)
+  const result = data.filter((item) => item.id !== id)
 
   try {
     await fs.writeFile(contactsPath, JSON.stringify(result, null, 2))
@@ -45,16 +47,16 @@ export const addContact = async (contact) => {
   }
 }
 
-export const updateContact = async (contactId, body) => {
+export const updateContact = async (id, body) => {
   const data = await listContacts()
-  if (!data.some((contact) => contact.id === contactId)) {
+  if (!data.some((contact) => contact.id === id)) {
     return false
   }
   const { name, email, phone } = body
   const result = data.map((item) => {
-    if (item.id === contactId) {
+    if (item.id === id) {
       return {
-        id: contactId,
+        id: id,
         name: name || item.name,
         email: email || item.email,
         phone: phone || item.phone,
@@ -65,7 +67,7 @@ export const updateContact = async (contactId, body) => {
   })
   try {
     await fs.writeFile(contactsPath, JSON.stringify(result, null, 2))
-    return result.find((item) => item.id === contactId)
+    return result.find((item) => item.id === id)
   } catch (error) {
     console.log(error)
     return false

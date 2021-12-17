@@ -1,12 +1,12 @@
 import express from 'express'
-import { postValidation, patchValidation, intId } from '../../middlware/contacts.js'
+import { postValidation, patchValidation, intId } from '../../middleware/contacts.js'
 import {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
-} from '../../model/index.js'
+} from '../../model/index'
 
 const router = express.Router()
 
@@ -21,14 +21,13 @@ router.get('/', async (_req, res) => {
 /**
  * Response one contact
  */
-router.get('/:contactId', intId, async (req, res) => {
-  const { contactId } = req.params
-  const result = await getContactById(contactId)
+router.get('/:id', intId, async (req, res) => {
+  const { id } = req.params
+  const result = await getContactById(id)
   if (result) {
-    res.json(result)
-  } else {
-    res.status(404).json({ message: 'Not found' })
+   return res.status(200).json(result)
   }
+  res.status(404).json({ message: 'Not found' })
 })
 
 /**
@@ -43,29 +42,25 @@ router.post('/', postValidation, async (req, res) => {
 /**
  * Delete contact
  */
-router.delete('/:contactId', intId, async (req, res) => {
-  const { contactId } = req.params
-  const result = await removeContact(contactId)
+router.delete('/:id', intId, async (req, res) => {
+  const { id } = req.params
+  const result = await removeContact(id)
   if (result) {
-    res.status(200).json({ message: 'contact deleted' })
-  } else {
-    res.status(404).json({ message: 'Not found' })
+    return res.status(200).json({ message: 'contact deleted' })
   }
+    res.status(404).json({ message: 'Not found' })
 })
 
-router.patch('/:contactId', patchValidation, intId, async (req, res) => {
-  const { contactId } = req.params
-  const { name, email, phone } = req.body
-  if (name || email || phone) {
-    const result = await updateContact(contactId, req.body)
-    if (result) {
-      res.status(200).json(result)
-    } else {
-      res.status(404).json({ message: 'Not found' })
-    }
-  } else {
-    res.status(400).json({ message: 'missing fields' })
+/**
+ * Edit contact
+ */
+router.patch('/:id', patchValidation, intId, async (req, res) => {
+  const { id } = req.params
+  const result = await updateContact(id, req.body)
+  if (result) {
+    return res.status(200).json(result)
   }
+    res.status(404).json({ message: 'Not found' })
 })
 
 export default router
