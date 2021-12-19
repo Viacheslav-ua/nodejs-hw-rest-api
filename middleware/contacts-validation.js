@@ -5,6 +5,7 @@ export const postValidation = async (req, res, next) => {
     name: Joi.string().min(2).max(255).trim().required(),
     email: Joi.string().min(4).max(255).trim().email().required(),
     phone: Joi.string().min(2).max(20).trim().required(),
+    favorite: Joi.boolean(),
   })
   try {
     await schema.validateAsync(req.body)
@@ -19,7 +20,8 @@ export const patchValidation = async (req, res, next) => {
     name: Joi.string().min(2).max(255).trim(),
     email: Joi.string().min(4).max(255).trim().email(),
     phone: Joi.string().min(2).max(20).trim(),
-  }).or('name', 'email', 'phone')
+    favorite: Joi.boolean(),
+  }).or('name', 'email', 'phone', 'favorite')
   try {
     await schema.validateAsync(req.body)
   } catch (error) {
@@ -28,12 +30,14 @@ export const patchValidation = async (req, res, next) => {
   next()
 }
 
-export const intId = (req, res, next) => {
-  const { id } = req.params
-  const idInt = parseInt(id)
-  if (isNaN(idInt)) {
-    return res.status(404).json({ message: 'Not found' })
+ export const idValidation = async (req, res, next) => {
+  const schema = Joi.object({
+    id: Joi.string().length(24).pattern(/^[0-9a-f]*$/)
+  });
+  try {
+    await schema.validateAsync(req.params)
+  } catch (error) {
+    return res.status(400).json({ message: error.details[0].message })
   }
-  req.params.id = idInt
   next()
-}
+ }
