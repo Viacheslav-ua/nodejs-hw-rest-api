@@ -1,71 +1,19 @@
 import express from 'express'
-import { postValidation, patchValidation, intId } from '../../middlware/contacts.js'
-import {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} from '../../model/index.js'
+import { postValidation, patchValidation, idValidation } from '../../middleware/contacts-validation.js'
+import contactsCtrl from '../../controllers/contacts-controller'
 
 const router = express.Router()
 
-/**
- * Response all contacts
- */
-router.get('/', async (_req, res) => {
-  const data = await listContacts()
-  res.json(data)
-})
+router.get('/', contactsCtrl.get)
 
-/**
- * Response one contact
- */
-router.get('/:contactId', intId, async (req, res) => {
-  const { contactId } = req.params
-  const result = await getContactById(contactId)
-  if (result) {
-    res.json(result)
-  } else {
-    res.status(404).json({ message: 'Not found' })
-  }
-})
+router.get('/:id', idValidation, contactsCtrl.getById)
 
-/**
- * Add contact
-*/
-router.post('/', postValidation, async (req, res) => {
-  const contact = { id: Date.now(), ...req.body }
-  const result = await addContact(contact)
-  res.status(201).json(result)
-})
+router.post('/', postValidation, contactsCtrl.create)
 
-/**
- * Delete contact
- */
-router.delete('/:contactId', intId, async (req, res) => {
-  const { contactId } = req.params
-  const result = await removeContact(contactId)
-  if (result) {
-    res.status(200).json({ message: 'contact deleted' })
-  } else {
-    res.status(404).json({ message: 'Not found' })
-  }
-})
+router.delete('/:id', idValidation, contactsCtrl.remove)
 
-router.patch('/:contactId', patchValidation, intId, async (req, res) => {
-  const { contactId } = req.params
-  const { name, email, phone } = req.body
-  if (name || email || phone) {
-    const result = await updateContact(contactId, req.body)
-    if (result) {
-      res.status(200).json(result)
-    } else {
-      res.status(404).json({ message: 'Not found' })
-    }
-  } else {
-    res.status(400).json({ message: 'missing fields' })
-  }
-})
+router.patch('/:id/favorite', idValidation, patchValidation, contactsCtrl.updateStatus)
+
+router.patch('/:id', idValidation, patchValidation, contactsCtrl.update)
 
 export default router
