@@ -1,4 +1,4 @@
-import Contact from "../service/schemas/contacts-schema"
+import Contact from "../models/contacts-model"
 
 const get = async (req, res, next) => {
   try {
