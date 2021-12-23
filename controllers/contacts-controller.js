@@ -1,15 +1,8 @@
-import {
-  getAllContacts,
-  getContactById,
-  createContact,
-  removeContact,
-  updateContact,
-  updateStatusContact,
-} from "../service";
+import Contact from "../service/schemas/contacts-schema"
 
 const get = async (req, res, next) => {
   try {
-    const result = await getAllContacts();
+    const result = await Contact.find();
     res.status(200).json(result);
   } catch (e) {
     console.error(e)
@@ -20,9 +13,9 @@ const get = async (req, res, next) => {
 const getById = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const result = await getContactById(id);
+    const result = await Contact.findOne({ _id: id })
     if (result) {
-      res.status(200).json(result);
+      res.status(200).json(result)
     }
     res.status(404).json({ message: 'Not found' })
 
@@ -34,7 +27,7 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => { 
   try {
-    const result = await createContact(req.body)
+    const result = await Contact.create(req.body)
     res.status(201).json(result)
   } catch (e) {
     console.error(e);
@@ -44,7 +37,7 @@ const create = async (req, res, next) => {
 
 const remove = async (req, res, next) => { 
   const { id } = req.params;
-  const result = await removeContact(id)
+  const result = await Contact.findByIdAndRemove({ _id: id })
   if (result) {
     return res.status(200).json({ message: result })
   }
@@ -53,7 +46,7 @@ const remove = async (req, res, next) => {
 
 const update = async (req, res, next) => { 
 
-  const result = await updateContact(req.params.id, req.body)
+  const result = await Contact.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true })
   if (result) {
     return res.status(200).json({ message: result })
   }
@@ -62,7 +55,7 @@ const update = async (req, res, next) => {
 
 const updateStatus = async (req, res, next) => { 
 
-  const result = await updateStatusContact(req.params.id, req.body)
+  const result = await Contact.findByIdAndUpdate({ _id: req.params.id }, {favorite: req.body.favorite}, { new: true })
   if (result) {
     return res.status(200).json({ message: result })
   }
