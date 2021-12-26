@@ -1,9 +1,21 @@
-import Contact from "../models/contacts-model"
+import {
+  getAllContacts,
+  getContactById,
+  createContact,
+  removeContact,
+  updateContact,
+  updateStatusContact,
+} from '../service/contacts-service'
+import {HttpCode, Messages} from '../lib/constans'
 
 const get = async (req, res, next) => {
   try {
-    const result = await Contact.find();
-    res.status(200).json(result);
+    const contacts = await getAllContacts(req.query)
+    res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { ...contacts },
+    });
   } catch (e) {
     console.error(e)
     next(e);
@@ -13,11 +25,20 @@ const get = async (req, res, next) => {
 const getById = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const result = await Contact.findOne({ _id: id })
-    if (result) {
-      res.status(200).json(result)
+    const contact = await getContactById(id)
+    console.log(contact);
+    if (contact) {
+      return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { contact },
+      });
     }
-    res.status(404).json({ message: 'Not found' })
+    res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: Messages.NOT_FOUND, 
+    })
 
   } catch (e) {
     console.error(e);
@@ -27,8 +48,12 @@ const getById = async (req, res, next) => {
 
 const create = async (req, res, next) => { 
   try {
-    const result = await Contact.create(req.body)
-    res.status(201).json(result)
+    const newContact = await createContact(req.body)
+    res.status(HttpCode.CREATED).json({
+      status: 'success',
+      code: HttpCode.CREATED,
+      data: {newContact },
+      })
   } catch (e) {
     console.error(e);
     next(e);
@@ -37,31 +62,54 @@ const create = async (req, res, next) => {
 
 const remove = async (req, res, next) => { 
   const { id } = req.params;
-  const result = await Contact.findByIdAndRemove({ _id: id })
-  if (result) {
-    return res.status(200).json({ message: result })
+  const contact = await removeContact(id)
+  if (contact) {
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { contact },
+      })
   }
-  res.status(404).json({ message: 'Not found' })
+  res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: Messages.NOT_FOUND, 
+    })
 }
 
 const update = async (req, res, next) => { 
 
-  const result = await Contact.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true })
-  if (result) {
-    return res.status(200).json({ message: result })
+  const contact = await updateContact(req.params.id, req.body)
+  if (contact) {
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { contact },
+      })
   }
-  res.status(404).json({ message: 'Not found' })
+  res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: Messages.NOT_FOUND, 
+    })
 }
 
-const updateStatus = async (req, res, next) => { 
+const updateStatus = async (req, res, next) => {
 
-  const result = await Contact.findByIdAndUpdate({ _id: req.params.id }, {favorite: req.body.favorite}, { new: true })
-  if (result) {
-    return res.status(200).json({ message: result })
+  const contact = await updateStatusContact(req.params.id, { favorite: req.body.favorite })
+  if (contact) {
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { contact },
+      })
   }
-  res.status(404).json({ message: 'Not found' })
+  res.status(HttpCode.NOT_FOUND).json({
+    status: 'error',
+    code: HttpCode.NOT_FOUND,
+    message: Messages.NOT_FOUND,
+  })
 }
-
 
 export default {
   get,
