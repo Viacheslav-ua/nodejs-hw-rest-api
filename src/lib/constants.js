@@ -13,5 +13,13 @@ export const HttpCode = {
 
 export const Messages = {
   NOT_FOUND: 'Not found',
+  BAD_REQUEST: 'Bad request',
   INTERNAL_SERVER_ERROR: 'Internal Server Error',
+  CONFLICT_EMAIL: 'Email is already in use',
+  REGISTRATION_ERROR: 'Registration error',
+  REGISTRATION_SUCCESSFUL: 'Registration successful',
+  NOT_FOUND_EMAIL: 'Email is not found',
+  PASSWORD_ERROR: 'Wrong password',
+  LOGIN_ERROR: 'Login error',
+  UNAUTHORIZED: 'Unauthorized access',
 }

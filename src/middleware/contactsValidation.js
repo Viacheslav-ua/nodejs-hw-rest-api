@@ -1,5 +1,6 @@
 import Joi from 'joi'
-import {HttpCode} from '../lib/constans'
+import { HttpCode } from '../lib/constants'
+import resError from '../lib/responseError'
 
 export const postValidation = async (req, res, next) => {
   const schema = Joi.object({
@@ -11,12 +12,8 @@ export const postValidation = async (req, res, next) => {
   try {
     await schema.validateAsync(req.body)
   } catch (error) {
-    return res.status(HttpCode.BAD_REQUEST).json({
-      status: 'error',
-      code: HttpCode.BAD_REQUEST,
-      message: error.details[0].message,
-    })
- }
+    return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest(error.details[0].message))
+  }
   next()
 }
 
@@ -30,11 +27,7 @@ export const patchValidation = async (req, res, next) => {
   try {
     await schema.validateAsync(req.body)
   } catch (error) {
-    return res.status(HttpCode.BAD_REQUEST).json({
-      status: 'error',
-      code: HttpCode.BAD_REQUEST,
-      message: error.details[0].message,
-    })
+    return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest(error.details[0].message))
   }
   next()
 }
@@ -46,11 +39,7 @@ export const patchValidation = async (req, res, next) => {
   try {
     await schema.validateAsync(req.params)
   } catch (error) {
-    return res.status(HttpCode.BAD_REQUEST).json({
-      status: 'error',
-      code: HttpCode.BAD_REQUEST,
-      message: error.details[0].message,
-    })
+    return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest(error.details[0].message))
   }
   next()
 }
@@ -66,11 +55,7 @@ export const queryValidation = async (req, res, next) => {
   try {
     await schema.validateAsync(req.query)
   } catch (error) {
-    return res.status(HttpCode.BAD_REQUEST).json({
-      status: 'error',
-      code: HttpCode.BAD_REQUEST,
-      message: error.details[0].message,
-    })
+    return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest(error.details[0].message))
   }
   next()
 }
