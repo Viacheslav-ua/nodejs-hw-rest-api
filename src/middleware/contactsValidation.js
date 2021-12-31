@@ -47,7 +47,9 @@ export const patchValidation = async (req, res, next) => {
 export const queryValidation = async (req, res, next) => {
   const schema = Joi.object({
     limit: Joi.string().pattern(/\d+/).optional(),
-    skip: Joi.string().pattern(/\d+/).optional(),
+    // skip: Joi.string().pattern(/\d+/).optional(),
+    page: Joi.string().pattern(/\d+/).optional(),
+    favorite: Joi.boolean().optional(),
     sortBy: Joi.string().valid('name', 'email', 'createdAt', 'updatedAt', 'phone' ).optional(),
     sortByDesc: Joi.string().valid('name', 'email', 'createdAt', 'updatedAt', 'phone').optional(),
     filter: Joi.string() .pattern(/(name|email|favorite|phone)\\|(name|email|favorite|phone)/).optional(),

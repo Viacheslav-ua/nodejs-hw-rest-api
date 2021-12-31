@@ -33,7 +33,7 @@ export const getAllContacts = async ({
   if (filter) {
     query.select(filter.split('|').join(' '))
   }
-  const result = await query.limit(parseInt(limit)).skip(parseInt(skip)).sort(sortCriteria)
+  const result = await query.limit(parseInt(limit)).skip(skip).sort(sortCriteria)
   return { total, contacts: result }
 }
  
