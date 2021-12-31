@@ -26,3 +26,19 @@ export const current = async (req, res) => {
       }
     })
 }
+
+export const updateSubscription = async(req, res) => {
+  const { subscription } = req.body
+  console.log(subscription);
+  const user = await User.findOneAndUpdate(
+    { _id: req.user.id, owner: req.user.id }, { subscription: subscription }, { new: true }
+  )
+  if (user) {
+    return res.status(HttpCode.OK).json({
+      status: `${HttpCode.OK} OK`,
+      ContentType: "application/json",
+      ResponseBody: { user },
+      })
+  }
+  res.status(HttpCode.NOT_FOUND).json(resError.notFound()) 
+}

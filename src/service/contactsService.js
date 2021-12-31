@@ -15,15 +15,12 @@ export const getAllContacts = async ({
   let sortCriteria = null
   const total = await Contact.find({ owner: UserId }).countDocuments()
   let query
-  console.log("sfdg", favorite)
   if (favorite) {
     query = Contact.find({ owner: UserId, favorite: favorite })
   } else {
     query = Contact.find({ owner: UserId})
   }
-  // const query = Contact.find({ owner: UserId})
-  
-  
+    
   if (sortBy) {
     sortCriteria = {[`${sortBy}`]: 1}
   }
