@@ -3,7 +3,6 @@ import User from "../models/userModel"
 
 export const generateTokens = (payload) => {
   const accessToken = jwt.sign(payload, process.env.ACCESS_SECRET, { expiresIn: '8h' })
-  // const refreshToken = jwt.sign(payload, process.env.REFRESH_SECRET, { expiresIn: '30d' })
   return accessToken
 }
 

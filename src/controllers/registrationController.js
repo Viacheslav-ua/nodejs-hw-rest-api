@@ -14,7 +14,7 @@ const registration = async (req, res, next) => {
   try {
     const hashPassword = await bcrypt.hash(password, 8)
     const newUser = new User({ email, password: hashPassword })
-    const profile = await newUser.save()
+    await newUser.save()
     
     res.status(HttpCode.CREATED).json({
       status: `${HttpCode.CREATED} Created`,
@@ -22,8 +22,8 @@ const registration = async (req, res, next) => {
       ResponseBody: {
         message: Messages.REGISTRATION_SUCCESSFUL,
         user: {
-          email: profile.email,
-          subscription: profile.subscription,
+          email: newUser.email,
+          subscription: newUser.subscription,
         }
       }
   })

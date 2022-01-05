@@ -13,25 +13,20 @@ export const logout = async (req, res) => {
 }
 
 export const current = async (req, res) => {
-  const user = await User.findOne({ _id: req.user.id })
-  if (!user) {
-    return res.status(HttpCode.UNAUTHORIZED).json(resError.unauthorized())
-  }
   return res.status(HttpCode.OK).json({
       status: `${HttpCode.OK} OK`,
       ContentType: 'application/json',
       ResponseBody: {
-        email: user.email,
-        subscription: user.subscription,
+        email: req.user.email,
+        subscription: req.user.subscription,
       }
     })
 }
 
 export const updateSubscription = async(req, res) => {
   const { subscription } = req.body
-  console.log(subscription);
   const user = await User.findOneAndUpdate(
-    { _id: req.user.id, owner: req.user.id }, { subscription: subscription }, { new: true }
+    { _id: req.user.id }, { subscription: subscription }, { new: true }
   )
   if (user) {
     return res.status(HttpCode.OK).json({

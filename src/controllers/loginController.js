@@ -5,18 +5,15 @@ import { HttpCode, Messages } from '../lib/constants'
 import { generateTokens } from '../service/tokenService'
 import resError from '../lib/responseError'
 
-const login = async (req, res, nex) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
     const user = await User.findOne({ email })
     const validPassword = bcrypt.compareSync(password, user.password)
     
-    if (!user) {
-      return res.code(HttpCode.BAD_REQUEST).json(resError.badRequest(Messages.NOT_FOUND_EMAIL))
-    }
-    if (!validPassword) {
-      return res.status(HttpCode.BAD_REQUEST).json(resError.unauthorized(Messages.PASSWORD_ERROR))
+    if (!user || !validPassword) {
+      return res.status(HttpCode.BAD_REQUEST).json(resError.unauthorized('Credentials incorrect'))
     }
 
     const payload = { id: user.id, email: user.email, subscription: user.subscription }
