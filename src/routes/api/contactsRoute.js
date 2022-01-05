@@ -1,10 +1,10 @@
 import express from 'express'
-import { postValidation, patchValidation, idValidation } from '../../middleware/contacts-validation.js'
-import contactsCtrl from '../../controllers/contacts-controller'
+import { postValidation, patchValidation, idValidation, queryValidation } from '../../middleware/contactsValidation.js'
+import contactsCtrl from '../../controllers/contactsController'
 
 const router = express.Router()
 
-router.get('/', contactsCtrl.get)
+router.get('/', queryValidation, contactsCtrl.get)
 
 router.get('/:id', idValidation, contactsCtrl.getById)
 
