@@ -3,6 +3,7 @@ import logger from 'morgan'
 import cors from 'cors'
 
 import authRouter from './routes/api/authRoute'
+import usersRouter from './routes/api/usersRoute'
 import contactsRouter from './routes/api/contactsRoute'
 import { HttpCode, Messages } from './lib/constants'
 import guard from './middleware/guard'
@@ -17,7 +18,10 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/users', authRouter)
-app.use('/api/contacts', guard , contactsRouter)
+app.use('/api/users', guard, usersRouter)
+app.use('/api/contacts', guard, contactsRouter)
+
+app.use(express.static(process.env.STATIC_DIR))
 
 app.use((req, res) => {
   res.status(HttpCode.NOT_FOUND).json(resError.notFound())

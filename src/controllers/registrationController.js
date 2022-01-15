@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import gravatar from 'gravatar'
 
 import User from "../models/userModel"
 import { HttpCode, Messages } from '../lib/constants'
@@ -13,7 +14,8 @@ const registration = async (req, res, next) => {
   }
   try {
     const hashPassword = await bcrypt.hash(password, 8)
-    const newUser = new User({ email, password: hashPassword })
+    const avatarURL = gravatar.url(email, {s: '250'}, true);
+    const newUser = new User({ email, password: hashPassword, avatarURL: avatarURL })
     await newUser.save()
     
     res.status(HttpCode.CREATED).json({
