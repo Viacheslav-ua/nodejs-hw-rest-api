@@ -23,6 +23,13 @@ const contactsSchema = new Schema({
   avatarURL: {
     type: String,
   },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+  },
 },{ versionKey: false, timestamps: true })
 
 const User = model('User', contactsSchema)

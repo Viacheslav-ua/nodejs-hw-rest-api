@@ -2,14 +2,14 @@ import bcrypt from 'bcrypt'
 
 import User from "../models/userModel"
 import { HttpCode, Messages } from '../lib/constants'
-import { generateTokens } from '../service/tokenService'
+import { generateTokens } from '../service/authService'
 import resError from '../lib/responseError'
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email, verify: true })
     const validPassword = bcrypt.compareSync(password, user.password)
     
     if (!user || !validPassword) {
