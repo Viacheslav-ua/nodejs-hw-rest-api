@@ -3,6 +3,7 @@ import sgMail from '@sendgrid/mail'
 import User from "../models/userModel"
 import { HttpCode } from '../lib/constants'
 import resError from '../lib/responseError'
+import getMsg from '../lib/msgHelper'
 
 const sendEmailToken = async (req, res, next) => {
   const { email } = req.body
@@ -12,14 +13,8 @@ const sendEmailToken = async (req, res, next) => {
     if (user.verify) {
       return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest('Verification has already been passed'))
     }
-    const msg = {
-      to: email,
-      from: process.env.SENDER_SENDGRID,
-      subject: "E-mail confirmation",
-      text: `Go to the confirmation link ${req.protocol}://${req.get('host')}/api/users/verify/${user.verificationToken}`,
-      html: `<strong>Go to the confirmation link <a href="${req.protocol}://${req.get('host')}/api/users/verify/${user.verificationToken}">CONFIRM</a> </strong>`,
-    }
-    
+        
+    const msg = getMsg(req, user.verificationToken)
     const sending = await sgMail.send(msg)
     if (sending) {
       console.log('Email sent')

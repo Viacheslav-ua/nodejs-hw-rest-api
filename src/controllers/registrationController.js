@@ -6,6 +6,7 @@ import sgMail from '@sendgrid/mail'
 import User from "../models/userModel"
 import { HttpCode, Messages } from '../lib/constants'
 import resError from '../lib/responseError'
+import getMsg from '../lib/msgHelper'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
@@ -23,13 +24,7 @@ const registration = async (req, res, next) => {
     const newUser = new User({ email, password: hashPassword, verificationToken, avatarURL })
     await newUser.save()
 
-    const msg = {
-      to: email,
-      from: process.env.SENDER_SENDGRID,
-      subject: "E-mail confirmation",
-      text: `Go to the confirmation link ${req.protocol}://${req.get('host')}/api/users/verify/${verificationToken}`,
-      html: `<strong>Go to the confirmation link <a href="${req.protocol}://${req.get('host')}/api/users/verify/${verificationToken}">CONFIRM</a> </strong>`,
-    }
+    const msg = getMsg(req, verificationToken)
     await sgMail.send(msg).then(() => console.log('Email sent'))
  
     res.status(HttpCode.CREATED).json({
