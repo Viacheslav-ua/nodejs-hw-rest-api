@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "app": "node app.js",
     "start": "cross-env NODE_ENV=production node -r dotenv/config --es-module-specifier-resolution=node ./src/bin/server.js",
     "start:dev": "cross-env NODE_ENV=development nodemon -r dotenv/config --es-module-specifier-resolution=node ./src/bin/server.js",
     "lint": "eslint **/*.js",

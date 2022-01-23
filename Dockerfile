@@ -1,13 +1,14 @@
 FROM node:16
 
-WORKDIR /usr/src/app
+WORKDIR /
 
-COPY package*.json /usr/src/app/
+COPY package*.json .
 
 RUN npm install
 
-COPY . .
+COPY ./src .
 
 EXPOSE 3000
 
-CMD ["node", "./src/bin/server.js"]
+# CMD ["node", "src/bin/server.js"]
+CMD npm run start

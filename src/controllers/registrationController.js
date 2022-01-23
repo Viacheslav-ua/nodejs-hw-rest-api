@@ -1,14 +1,11 @@
 import bcrypt from 'bcrypt'
 import gravatar from 'gravatar'
 import { v4 as uuidv4 } from 'uuid';
-import sgMail from '@sendgrid/mail'
 
 import User from "../models/userModel"
 import { HttpCode, Messages } from '../lib/constants'
 import resError from '../lib/responseError'
-import getMsg from '../lib/msgHelper'
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+import sendVerify from '../lib/sendVerify'
 
 const registration = async (req, res, next) => {
   const { email, password } = req.body
@@ -24,9 +21,10 @@ const registration = async (req, res, next) => {
     const newUser = new User({ email, password: hashPassword, verificationToken, avatarURL })
     await newUser.save()
 
-    const msg = getMsg(req, verificationToken)
-    await sgMail.send(msg).then(() => console.log('Email sent'))
- 
+    const sending = await sendVerify(req, verificationToken)
+    if (sending) {
+      console.log('Email sent')
+    }
     res.status(HttpCode.CREATED).json({
       status: `${HttpCode.CREATED} Created`,
       ContentType: 'application/json',

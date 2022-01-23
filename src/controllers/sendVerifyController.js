@@ -1,9 +1,7 @@
-import sgMail from '@sendgrid/mail'
-
 import User from "../models/userModel"
 import { HttpCode } from '../lib/constants'
 import resError from '../lib/responseError'
-import getMsg from '../lib/msgHelper'
+import sendVerify from '../lib/sendVerify'
 
 const sendEmailToken = async (req, res, next) => {
   const { email } = req.body
@@ -14,8 +12,7 @@ const sendEmailToken = async (req, res, next) => {
       return res.status(HttpCode.BAD_REQUEST).json(resError.badRequest('Verification has already been passed'))
     }
         
-    const msg = getMsg(req, user.verificationToken)
-    const sending = await sgMail.send(msg)
+    const sending = await sendVerify(req, user.verificationToken)
     if (sending) {
       console.log('Email sent')
       res.status(HttpCode.OK).json({
