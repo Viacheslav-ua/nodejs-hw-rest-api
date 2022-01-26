@@ -1,6 +1,6 @@
 import { HttpCode } from "../lib/constants"
 import resError from '../lib/responseError'
-import { validateToken } from "../service/tokenService"
+import { validateToken } from "../service/authService"
 
 const guard = async (req, res, next) => {
   try {
